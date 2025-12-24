@@ -1,0 +1,121 @@
+<resources>
+    <string name="app_name">SIMCAT</string>
+
+    <!-- Auth -->
+    <string name="welcome_login">Selamat Datang di SIMCAT</string>
+    <string name="welcome_register">Daftar di SIMCAT</string>
+    <string name="subtitle">Sistem Informasi Manajemen UKM Catur</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard">Dashboard</string>
+    <string name="selamat_datang">Selamat Datang, %1$s</string>
+
+    <!-- Menu -->
+    <string name="profil">Profil</string>
+    <string name="kelola_peralatan">Kelola Peralatan</string>
+    <string name="peralatan">Peralatan</string>
+    <string name="semua_peminjaman">Semua Peminjaman</string>
+    <string name="riwayat_peminjaman">Riwayat Peminjaman</string>
+    <string name="jadwal_kegiatan">Jadwal Kegiatan</string>
+    <string name="kegiatan_saya">Kegiatan Saya</string>
+    <string name="keluar">Keluar</string>
+
+    <!-- Profile -->
+    <string name="informasi_akun">Informasi akun Anda</string>
+    <string name="member_sejak">Member sejak %1$s</string>
+    <string name="admin_sejak">Admin sejak %1$s</string>
+    <string name="email">Email</string>
+    <string name="nomor_telepon">Nomor Telepon</string>
+    <string name="alamat">Alamat</string>
+    <string name="edit_profil">Edit Profil</string>
+    <string name="ubah_password">Ubah Password</string>
+
+    <!-- Edit Profile -->
+    <string name="nama_lengkap">Nama Lengkap</string>
+    <string name="simpan_perubahan">Simpan Perubahan</string>
+
+    <!-- Change Password -->
+    <string name="password_lama">Password Lama</string>
+    <string name="password_baru">Password Baru</string>
+    <string name="konfirmasi_password_baru">Konfirmasi Password Baru</string>
+    <string name="password">Password</string>
+    <string name="konfirmasi_password">Konfirmasi Password</string>
+
+    <!-- Buttons -->
+    <string name="daftar">Daftar</string>
+    <string name="masuk">Masuk</string>
+    <string name="sudah_punya_akun">Sudah punya akun?</string>
+    <string name="masuk_disini">Masuk di sini</string>
+    <string name="belum_punya_akun">Belum punya akun?</string>
+    <string name="daftar_disini">Daftar di sini</string>
+
+    <!-- Placeholders -->
+    <string name="hint_nama">Nama Anda</string>
+    <string name="hint_email">nama@email.com</string>
+    <string name="hint_phone">+62 812 3456 7890</string>
+    <string name="hint_password">••••••••</string>
+
+    <!-- Accessibility -->
+    <string name="back_button">Kembali</string>
+    <string name="profile_picture">Foto profil</string>
+    <string name="email_icon">Ikon email</string>
+    <string name="phone_icon">Ikon telepon</string>
+    <string name="location_icon">Ikon lokasi</string>
+    <!-- Equipment -->
+    <string name="daftar_peralatan">Daftar Peralatan</string>
+    <string name="kelola_peralatan_desc">Tambah, edit, atau hapus peralatan</string>
+    <string name="peralatan_tersedia">Peralatan yang tersedia</string>
+    <string name="tersedia">Tersedia</string>
+    <string name="pinjam">Pinjam</string>
+    <string name="edit">Edit</string>
+    <string name="hapus">Hapus</string>
+    <string name="tambah">Tambah</string>
+    <string name="nama_peralatan">Nama Peralatan</string>
+    <string name="merk">Merk</string>
+    <string name="harga">Harga</string>
+    <string name="total">Total</string>
+    <string name="tambah_peralatan">Tambah Peralatan</string>
+    <string name="edit_peralatan">Edit Peralatan</string>
+    <string name="pinjam_peralatan">Pinjam Peralatan</string>
+    <string name="jumlah">Jumlah</string>
+    <string name="konfirmasi_pinjam">Konfirmasi Pinjam</string>
+
+    <!-- Borrow -->
+    <string name="riwayat_peminjaman_desc">Peralatan yang Anda pinjam</string>
+    <string name="semua_peminjaman_desc">Kelola peminjaman dari semua member</string>
+    <string name="dipinjam">Dipinjam</string>
+    <string name="dikembalikan">Dikembalikan</string>
+    <string name="semua">Semua</string>
+    <string name="peminjam">Peminjam</string>
+    <string name="jumlah_pinjam">Jumlah</string>
+    <string name="tanggal_pinjam">Tanggal Pinjam</string>
+    <string name="tanggal_dikembalikan">Tanggal Dikembalikan</string>
+    <string name="lihat_detail">Lihat Detail</string>
+    <string name="kembalikan">Kembalikan</string>
+    <string name="kembalikan_peralatan">Kembalikan Peralatan</string>
+    <string name="penerima_barang">Penerima Barang</string>
+    <string name="upload_foto_kondisi">Upload Foto Kondisi Barang</string>
+    <string name="klik_upload_foto">Klik untuk upload foto</string>
+    <string name="konfirmasi_kembalikan">Konfirmasi Kembalikan</string>
+    <string name="pastikan_kondisi_baik">Pastikan peralatan dalam kondisi baik sebelum dikembalikan.</string>
+
+    <!-- Schedule -->
+    <string name="jadwal_kegiatan_admin">Kelola kegiatan UKM Catur</string>
+    <string name="jadwal_kegiatan_member">Kegiatan yang akan datang</string>
+    <string name="nama_kegiatan">Nama Kegiatan</string>
+    <string name="jenis_kegiatan">Jenis Kegiatan</string>
+    <string name="tanggal">Tanggal</string>
+    <string name="waktu">Waktu</string>
+    <string name="lokasi">Lokasi</string>
+    <string name="max_peserta">Max Peserta</string>
+    <string name="deskripsi">Deskripsi</string>
+    <string name="peserta_terdaftar">Peserta Terdaftar</string>
+    <string name="ikuti_kegiatan">Ikuti Kegiatan</string>
+    <string name="konfirmasi_ikuti">Konfirmasi Ikuti</string>
+    <string name="pastikan_hadir">Pastikan Anda dapat hadir pada waktu yang telah ditentukan.</string>
+    <string name="tambah_kegiatan">Tambah Kegiatan</string>
+    <string name="edit_kegiatan">Edit Kegiatan</string>
+    <string name="latihan">Latihan</string>
+    <string name="turnamen">Turnamen</string>
+    <string name="rapat">Rapat</string>
+</resources>
