@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.1.63:8080/" // Untuk emulator
+    private const val BASE_URL = "http://10.188.7.131:8080/" // Untuk emulator
     // Ganti dengan IP laptop Anda jika menggunakan device fisik: "http://192.168.x.x:8080/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

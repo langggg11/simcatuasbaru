@@ -41,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:text="Kelola Peralatan"
                     android:textColor="@color/white"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:textStyle="bold"
                     android:fontFamily="sans-serif-medium" />
 
@@ -60,16 +60,16 @@
             <Button
                 android:id="@+id/btnAdd"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="wrap_content"
                 android:background="@drawable/bg_badge_admin"
-                android:text="+ Tambah"
-                android:textColor="@color/primary"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textAllCaps="false"
+                android:fontFamily="sans-serif-medium"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:fontFamily="sans-serif-medium" />
+                android:paddingEnd="8dp"
+                android:text="+ Tambah"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 

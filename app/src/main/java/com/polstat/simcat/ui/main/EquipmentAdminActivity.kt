@@ -184,21 +184,22 @@ class EquipmentAdminActivity : AppCompatActivity() {
             Toast.makeText(this, "Merk tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (price.isEmpty() || price.toDoubleOrNull() == null) {
+        val p = price.toDoubleOrNull()
+        if (price.isEmpty() || p == null) {
             Toast.makeText(this, "Harga tidak valid", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (total.isEmpty() || total.toIntOrNull() == null) {
+        val t = total.toIntOrNull()
+        if (total.isEmpty() || t == null) {
             Toast.makeText(this, "Total tidak valid", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (available.isEmpty() || available.toIntOrNull() == null) {
+        val a = available.toIntOrNull()
+        if (available.isEmpty() || a == null) {
             Toast.makeText(this, "Tersedia tidak valid", Toast.LENGTH_SHORT).show()
             return false
         }
-        val availableInt = available.toInt()
-        val totalInt = total.toInt()
-        if (availableInt > totalInt) {
+        if (a > t) {
             Toast.makeText(this, "Tersedia tidak boleh lebih dari total", Toast.LENGTH_SHORT).show()
             return false
         }
@@ -209,22 +210,20 @@ class EquipmentAdminActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
-                Log.d("EquipmentAdmin", "Creating equipment with token: Bearer $token")
-                Log.d("EquipmentAdmin", "Equipment data: $equipment")
-
                 val response = RetrofitClient.apiService.createEquipment(
                     "Bearer $token",
                     equipment
                 )
 
                 if (response.isSuccessful) {
-                    Toast.makeText(this@EquipmentAdminActivity, "Peralatan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                    val message = response.body()?.string() ?: "Peralatan berhasil ditambahkan"
+                    Toast.makeText(this@EquipmentAdminActivity, message, Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                     loadEquipment()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Gagal menambahkan peralatan"
-                    Log.e("EquipmentAdmin", "Create error: ${response.code()} - $errorMsg")
-                    Toast.makeText(this@EquipmentAdminActivity, "Gagal: ${response.code()}", Toast.LENGTH_LONG).show()
+                    val errorMsg = response.errorBody()?.string() ?: "Gagal: ${response.code()}"
+                    Log.e("EquipmentAdmin", "Create error: $errorMsg")
+                    Toast.makeText(this@EquipmentAdminActivity, "Error ${response.code()}: Periksa hak akses admin.", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 Log.e("EquipmentAdmin", "Create exception", e)
@@ -237,8 +236,6 @@ class EquipmentAdminActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
-                Log.d("EquipmentAdmin", "Updating equipment ID: ${equipment.id}")
-
                 val response = RetrofitClient.apiService.updateEquipment(
                     "Bearer $token",
                     equipment.id ?: 0,
@@ -246,13 +243,14 @@ class EquipmentAdminActivity : AppCompatActivity() {
                 )
 
                 if (response.isSuccessful) {
-                    Toast.makeText(this@EquipmentAdminActivity, "Peralatan berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                    val message = response.body()?.string() ?: "Peralatan berhasil diperbarui"
+                    Toast.makeText(this@EquipmentAdminActivity, message, Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
                     loadEquipment()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Gagal memperbarui peralatan"
-                    Log.e("EquipmentAdmin", "Update error: ${response.code()} - $errorMsg")
-                    Toast.makeText(this@EquipmentAdminActivity, "Gagal: ${response.code()}", Toast.LENGTH_LONG).show()
+                    val errorMsg = response.errorBody()?.string() ?: "Gagal: ${response.code()}"
+                    Log.e("EquipmentAdmin", "Update error: $errorMsg")
+                    Toast.makeText(this@EquipmentAdminActivity, "Error ${response.code()}: Gagal update.", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 Log.e("EquipmentAdmin", "Update exception", e)
@@ -265,20 +263,19 @@ class EquipmentAdminActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
-                Log.d("EquipmentAdmin", "Deleting equipment ID: ${equipment.id}")
-
                 val response = RetrofitClient.apiService.deleteEquipment(
                     "Bearer $token",
                     equipment.id ?: 0
                 )
 
                 if (response.isSuccessful) {
-                    Toast.makeText(this@EquipmentAdminActivity, "Peralatan berhasil dihapus", Toast.LENGTH_SHORT).show()
+                    val message = response.body()?.string() ?: "Peralatan berhasil dihapus"
+                    Toast.makeText(this@EquipmentAdminActivity, message, Toast.LENGTH_SHORT).show()
                     loadEquipment()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Gagal menghapus peralatan"
-                    Log.e("EquipmentAdmin", "Delete error: ${response.code()} - $errorMsg")
-                    Toast.makeText(this@EquipmentAdminActivity, "Gagal: ${response.code()}", Toast.LENGTH_LONG).show()
+                    val errorMsg = response.errorBody()?.string() ?: "Gagal: ${response.code()}"
+                    Log.e("EquipmentAdmin", "Delete error: $errorMsg")
+                    Toast.makeText(this@EquipmentAdminActivity, "Error ${response.code()}: Gagal hapus.", Toast.LENGTH_LONG).show()
                 }
             } catch (e: Exception) {
                 Log.e("EquipmentAdmin", "Delete exception", e)

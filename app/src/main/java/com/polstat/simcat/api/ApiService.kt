@@ -10,6 +10,7 @@ import com.polstat.simcat.model.Schedule
 import com.polstat.simcat.model.Participation
 import com.polstat.simcat.model.MessageResponse
 import retrofit2.Response
+import okhttp3.ResponseBody
 import retrofit2.http.*
 
 interface ApiService {
@@ -44,7 +45,6 @@ interface ApiService {
     suspend fun deleteAccount(@Header("Authorization") token: String): Response<MessageResponse>
 
     // ==================== EQUIPMENT ====================
-
     @GET("api/equipment/getall")
     suspend fun getAllEquipment(): Response<List<Equipment>>
 
@@ -52,20 +52,20 @@ interface ApiService {
     suspend fun createEquipment(
         @Header("Authorization") token: String,
         @Body equipment: Equipment
-    ): Response<MessageResponse>
+    ): Response<ResponseBody> // Gunakan ResponseBody untuk teks biasa
 
     @PUT("api/equipment/{id}")
     suspend fun updateEquipment(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
         @Body equipment: Equipment
-    ): Response<MessageResponse>
+    ): Response<ResponseBody>
 
     @DELETE("api/equipment/{id}")
     suspend fun deleteEquipment(
         @Header("Authorization") token: String,
         @Path("id") id: Long
-    ): Response<MessageResponse>
+    ): Response<ResponseBody>
 
     // ==================== BORROW ====================
 
@@ -91,7 +91,6 @@ interface ApiService {
     ): Response<List<Borrow>>
 
     // ==================== SCHEDULE ====================
-
     @GET("api/schedules/getall")
     suspend fun getAllSchedules(): Response<List<Schedule>>
 
@@ -99,20 +98,20 @@ interface ApiService {
     suspend fun createSchedule(
         @Header("Authorization") token: String,
         @Body schedule: Schedule
-    ): Response<Schedule>
+    ): Response<Schedule> // Tetap Schedule karena backend mengirim objek JSON
 
     @PUT("api/schedules/{id}")
     suspend fun updateSchedule(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
         @Body schedule: Schedule
-    ): Response<MessageResponse>
+    ): Response<ResponseBody> // Diubah dari MessageResponse
 
     @DELETE("api/schedules/delete/{id}")
     suspend fun deleteSchedule(
         @Header("Authorization") token: String,
         @Path("id") id: Long
-    ): Response<MessageResponse>
+    ): Response<ResponseBody> // Diubah dari MessageResponse
     // ==================== PARTICIPATION ====================
 
     @POST("api/participations/register")
