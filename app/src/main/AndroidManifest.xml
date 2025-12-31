@@ -78,6 +78,16 @@
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
+
+        <!-- Activity Baru untuk Jadwal Kegiatan -->
+        <activity
+            android:name=".ui.main.MyActivitiesActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.main.MonitoringActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

@@ -20,7 +20,6 @@ class DashboardMemberActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        // Get user data from session
         val userName = intent.getStringExtra("USER_NAME") ?: "Member"
 
         binding.tvWelcome.text = "Selamat Datang, $userName"
@@ -34,23 +33,21 @@ class DashboardMemberActivity : AppCompatActivity() {
         }
 
         binding.menuEquipment.setOnClickListener {
-            // TODO: Navigate to Equipment List
             startActivity(Intent(this, EquipmentListActivity::class.java))
         }
 
         binding.menuBorrows.setOnClickListener {
-            // TODO: Navigate to My Borrows
             startActivity(Intent(this, BorrowListActivity::class.java))
         }
 
         binding.menuSchedules.setOnClickListener {
-            // TODO: Navigate to Schedules
+            // Browse & ikuti kegiatan
             startActivity(Intent(this, ScheduleListActivity::class.java))
         }
 
         binding.menuMyActivities.setOnClickListener {
-            // TODO: Navigate to My Activities
-            // startActivity(Intent(this, MyActivitiesActivity::class.java))
+            // Kegiatan yang diikuti
+            startActivity(Intent(this, MyActivitiesActivity::class.java))
         }
 
         binding.menuLogout.setOnClickListener {

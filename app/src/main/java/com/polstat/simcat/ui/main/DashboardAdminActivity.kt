@@ -20,7 +20,6 @@ class DashboardAdminActivity : AppCompatActivity() {
 
         sessionManager = SessionManager(this)
 
-        // Get user data from session
         val userEmail = sessionManager.getAuthToken()
         val userName = intent.getStringExtra("USER_NAME") ?: "Admin"
 
@@ -35,24 +34,24 @@ class DashboardAdminActivity : AppCompatActivity() {
         }
 
         binding.menuEquipment.setOnClickListener {
-            // TODO: Navigate to Equipment Management
             startActivity(Intent(this, EquipmentAdminActivity::class.java))
         }
 
         binding.menuBorrows.setOnClickListener {
-            // TODO: Navigate to All Borrows
             startActivity(Intent(this, BorrowListActivity::class.java))
         }
 
         binding.menuSchedules.setOnClickListener {
-            // TODO: Navigate to Schedules
+            // CRUD jadwal kegiatan
             startActivity(Intent(this, ScheduleListActivity::class.java))
         }
 
-        binding.menuMyActivities.setOnClickListener {
-            // TODO: Navigate to My Activities
-            // startActivity(Intent(this, MyActivitiesActivity::class.java))
+        // BARU: Monitoring Kegiatan
+        binding.menuMonitoring.setOnClickListener {
+            startActivity(Intent(this, MonitoringActivity::class.java))
         }
+
+
 
         binding.menuLogout.setOnClickListener {
             showLogoutDialog()

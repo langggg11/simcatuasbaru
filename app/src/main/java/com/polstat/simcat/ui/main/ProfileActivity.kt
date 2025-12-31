@@ -10,7 +10,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.polstat.simcat.R
+import android.view.Gravity
 import com.polstat.simcat.api.RetrofitClient
 import com.polstat.simcat.auth.ChangePasswordRequest
 import com.polstat.simcat.databinding.ActivityProfileBinding
@@ -132,13 +132,15 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        dialog.show()
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
 
-        // Memaksa dialog agar melebar penuh mengikuti margin di XML
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
+        dialog.show()
     }
 
     private fun validateEditProfile(name: String, email: String, phone: String): Boolean {
@@ -226,13 +228,15 @@ class ProfileActivity : AppCompatActivity() {
             }
         }
 
-        dialog.show()
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
 
-        // Memaksa dialog agar lebar penuh
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
+        dialog.show()
     }
 
     private fun validateChangePassword(

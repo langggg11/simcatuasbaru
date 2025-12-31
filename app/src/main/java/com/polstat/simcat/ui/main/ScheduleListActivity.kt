@@ -4,8 +4,10 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import android.view.Window
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -22,7 +24,8 @@ import com.polstat.simcat.model.Participation
 import com.polstat.simcat.model.Schedule
 import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
+import java.text.SimpleDateFormat
+import java.util.*
 
 class ScheduleListActivity : AppCompatActivity() {
 
@@ -155,6 +158,14 @@ class ScheduleListActivity : AppCompatActivity() {
         val dialogBinding = DialogAddScheduleBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
 
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
         // Setup spinner
         val types = arrayOf("Latihan", "Turnamen", "Rapat")
         val spinnerAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, types)
@@ -202,6 +213,14 @@ class ScheduleListActivity : AppCompatActivity() {
 
         val dialogBinding = DialogAddScheduleBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
+
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
 
         // Setup spinner
         val types = arrayOf("Latihan", "Turnamen", "Rapat")
@@ -276,6 +295,14 @@ class ScheduleListActivity : AppCompatActivity() {
 
         val dialogBinding = DialogJoinScheduleBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
+
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
 
         with(dialogBinding) {
             tvScheduleName.text = schedule.title
@@ -445,10 +472,14 @@ class ScheduleListActivity : AppCompatActivity() {
                 val token = sessionManager.getAuthToken()
                 val userId = sessionManager.getUserId()
 
+                // Mengganti LocalDateTime.now() dengan alternatif yang kompatibel API 24
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                val currentDate = dateFormat.format(Date())
+
                 val participation = Participation(
                     userId = userId,
                     scheduleId = schedule.id ?: 0,
-                    registrationDate = LocalDateTime.now().toString(),
+                    registrationDate = currentDate,
                     status = "REGISTERED"
                 )
 

@@ -19,13 +19,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="24dp">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Pinjam Peralatan"
+                android:text="Batalkan Kegiatan"
                 android:textColor="@color/text_primary"
                 android:textSize="20sp"
                 android:textStyle="bold"
@@ -42,95 +42,116 @@
 
         </LinearLayout>
 
-        <!-- Equipment Image -->
-        <ImageView
-            android:id="@+id/ivEquipment"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:scaleType="centerCrop"
-            android:background="#000000"
-            app:cardCornerRadius="12dp" />
-
-        <!-- Peralatan -->
+        <!-- Kegiatan -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Peralatan"
+            android:text="Kegiatan"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:fontFamily="sans-serif" />
 
         <TextView
-            android:id="@+id/tvEquipmentName"
+            android:id="@+id/tvScheduleName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="Papan Catur Standar"
+            android:text="Turnamen Catur Bulanan"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
 
-        <!-- Tersedia -->
+        <!-- Waktu -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Tersedia"
+            android:text="Waktu"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:fontFamily="sans-serif" />
 
         <TextView
-            android:id="@+id/tvAvailable"
+            android:id="@+id/tvDateTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="8 unit"
+            android:text="22 Desember 2025 • 09:00 - 17:00"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:fontFamily="sans-serif" />
 
-        <!-- Jumlah -->
+        <!-- Alasan Pembatalan -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Jumlah"
+            android:text="Alasan Pembatalan *"
             android:textColor="@color/text_primary"
             android:textSize="14sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium" />
 
         <EditText
-            android:id="@+id/etQuantity"
+            android:id="@+id/etReason"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="100dp"
             android:layout_marginTop="8dp"
             android:background="@drawable/bg_input"
-            android:hint="1"
-            android:inputType="number"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:gravity="top|start"
+            android:hint="Tuliskan alasan Anda membatalkan kegiatan ini..."
+            android:padding="12dp"
             android:textColor="@color/text_primary"
-            android:textColorHint="@color/text_hint"
+            android:textColorHint="@color/text_secondary"
             android:textSize="14sp"
             android:fontFamily="sans-serif" />
 
-        <!-- Borrow Button -->
-        <Button
-            android:id="@+id/btnConfirm"
+        <!-- Confirmation Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Apakah Anda yakin ingin membatalkan pendaftaran dari kegiatan ini?"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif" />
+
+        <!-- Action Buttons -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_button_primary"
-            android:text="Konfirmasi Pinjam"
-            android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnTidak"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_button_outline"
+                android:text="Tidak"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <Button
+                android:id="@+id/btnYaBatalkan"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_button_danger"
+                android:text="Ya, Batalkan"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

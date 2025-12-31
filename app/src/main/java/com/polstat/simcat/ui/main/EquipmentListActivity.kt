@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -17,7 +19,8 @@ import com.polstat.simcat.model.Borrow
 import com.polstat.simcat.model.Equipment
 import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
-import java.time.LocalDate
+import java.text.SimpleDateFormat
+import java.util.*
 
 class EquipmentListActivity : AppCompatActivity() {
 
@@ -86,6 +89,14 @@ class EquipmentListActivity : AppCompatActivity() {
         val dialogBinding = DialogBorrowEquipmentBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
 
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
         with(dialogBinding) {
             tvEquipmentName.text = equipment.nama
             tvAvailable.text = "${equipment.jumlahTersedia ?: equipment.jumlah} unit"
@@ -127,10 +138,14 @@ class EquipmentListActivity : AppCompatActivity() {
                 val token = sessionManager.getAuthToken()
                 val userId = sessionManager.getUserId()
 
+                // Mengganti LocalDate.now() dengan alternatif yang kompatibel API 24
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val currentDate = dateFormat.format(Date())
+
                 val borrow = Borrow(
                     userId = userId,
                     equipmentId = equipment.id ?: 0,
-                    borrowDate = LocalDate.now().toString(),
+                    borrowDate = currentDate, // Gunakan tanggal yang sudah diformat
                     borrowStatus = "BORROWED",
                     jumlahDipinjam = quantity
                 )

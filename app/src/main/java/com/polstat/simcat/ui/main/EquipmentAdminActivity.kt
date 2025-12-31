@@ -18,6 +18,8 @@ import com.polstat.simcat.databinding.DialogAddEquipmentBinding
 import com.polstat.simcat.model.Equipment
 import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
+import android.view.WindowManager
+import android.view.Gravity
 
 class EquipmentAdminActivity : AppCompatActivity() {
 
@@ -115,9 +117,16 @@ class EquipmentAdminActivity : AppCompatActivity() {
             }
         }
 
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
         dialog.show()
     }
-
     private fun showEditDialog(equipment: Equipment) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -161,9 +170,16 @@ class EquipmentAdminActivity : AppCompatActivity() {
             }
         }
 
+        // Atur ukuran dialog menjadi 80% lebar layar
+        val displayMetrics = resources.displayMetrics
+        val width = (displayMetrics.widthPixels * 0.8).toInt()
+        val height = WindowManager.LayoutParams.WRAP_CONTENT
+
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
+
         dialog.show()
     }
-
     private fun showDeleteDialog(equipment: Equipment) {
         AlertDialog.Builder(this)
             .setTitle("Hapus Peralatan")

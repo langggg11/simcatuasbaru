@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -18,6 +20,7 @@ import com.polstat.simcat.databinding.DialogReturnEquipmentBinding
 import com.polstat.simcat.model.Borrow
 import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
+
 
 class BorrowListActivity : AppCompatActivity() {
 
@@ -161,8 +164,16 @@ class BorrowListActivity : AppCompatActivity() {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        // TAMBAHKAN KONFIGURASI INI UNTUK LEBAR DIALOG
+        val width = (resources.displayMetrics.widthPixels * 0.80).toInt()
+        val height = ViewGroup.LayoutParams.WRAP_CONTENT
+
         val dialogBinding = DialogBorrowDetailBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
+
+        // Atur ukuran dialog
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
 
         with(dialogBinding) {
             // Status
@@ -190,9 +201,6 @@ class BorrowListActivity : AppCompatActivity() {
                 layoutReturnDate.visibility = View.VISIBLE
                 tvReturnDate.text = borrow.returnDate
                 tvReceiver.text = borrow.notes ?: "-"
-
-                // Show dummy image for returned items
-               // ivConditionPhoto.setBackgroundColor(Color.GRAY)
             }
 
             btnClose.setOnClickListener {
@@ -207,13 +215,22 @@ class BorrowListActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    // Juga perbaiki showReturnDialog dengan cara yang sama:
     private fun showReturnDialog(borrow: Borrow) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+        // TAMBAHKAN KONFIGURASI INI UNTUK LEBAR DIALOG
+        val width = (resources.displayMetrics.widthPixels * 0.80).toInt()
+        val height = ViewGroup.LayoutParams.WRAP_CONTENT
+
         val dialogBinding = DialogReturnEquipmentBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
+
+        // Atur ukuran dialog
+        dialog.window?.setLayout(width, height)
+        dialog.window?.setGravity(Gravity.CENTER)
 
         with(dialogBinding) {
             tvEquipmentName.text = "Equipment ID: ${borrow.equipmentId}"

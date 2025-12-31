@@ -2,6 +2,7 @@ package com.polstat.simcat.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.polstat.simcat.R
 import com.polstat.simcat.databinding.ItemScheduleMemberBinding
@@ -71,17 +72,30 @@ class ScheduleMemberAdapter(
             if (isJoined) {
                 btnJoin.text = "✓ Anda sudah terdaftar"
                 btnJoin.setBackgroundResource(R.drawable.bg_button_success)
-                btnJoin.isEnabled = false
+                btnJoin.setTextColor(ContextCompat.getColor(btnJoin.context, R.color.white))
+
+                // Jangan gunakan isEnabled = false (akan membuat tombol jadi putih)
+                // Sebagai gantinya, gunakan isClickable dan isFocusable = false
+                btnJoin.isClickable = false
+                btnJoin.isFocusable = false
                 btnJoin.alpha = 0.7f
             } else {
                 btnJoin.text = "Ikuti Kegiatan"
                 btnJoin.setBackgroundResource(R.drawable.bg_button_primary)
+                btnJoin.setTextColor(ContextCompat.getColor(btnJoin.context, R.color.white))
+
+                // Kembalikan ke normal untuk tombol yang bisa diklik
+                btnJoin.isClickable = true
+                btnJoin.isFocusable = true
                 btnJoin.isEnabled = true
                 btnJoin.alpha = 1.0f
             }
 
+            // Tetap set click listener
             btnJoin.setOnClickListener {
-                if (!isJoined) {
+                // Cek ulang status join untuk memastikan
+                val currentIsJoined = joinedScheduleIds.contains(schedule.id)
+                if (!currentIsJoined) {
                     onJoinClick(schedule)
                 }
             }
