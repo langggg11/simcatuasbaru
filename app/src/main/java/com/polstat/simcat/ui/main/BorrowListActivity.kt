@@ -1,5 +1,6 @@
 package com.polstat.simcat.ui.main
 
+import android.app.DatePickerDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -20,7 +21,10 @@ import com.polstat.simcat.databinding.DialogReturnEquipmentBinding
 import com.polstat.simcat.model.Borrow
 import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
-
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 class BorrowListActivity : AppCompatActivity() {
 
@@ -29,6 +33,8 @@ class BorrowListActivity : AppCompatActivity() {
     private lateinit var adapter: BorrowAdapter
     private var borrowList = listOf<Borrow>()
     private var filteredList = listOf<Borrow>()
+    private var equipmentMap = mapOf<Long, String>()
+    private var userMap = mapOf<Long, String>()
     private var isAdmin = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,21 +74,10 @@ class BorrowListActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.btnBack.setOnClickListener {
-            finish()
-        }
-
-        binding.tabBorrowed.setOnClickListener {
-            selectTab("BORROWED")
-        }
-
-        binding.tabReturned.setOnClickListener {
-            selectTab("RETURNED")
-        }
-
-        binding.tabAll.setOnClickListener {
-            selectTab("ALL")
-        }
+        binding.btnBack.setOnClickListener { finish() }
+        binding.tabBorrowed.setOnClickListener { selectTab("BORROWED") }
+        binding.tabReturned.setOnClickListener { selectTab("RETURNED") }
+        binding.tabAll.setOnClickListener { selectTab("ALL") }
     }
 
     private fun selectTab(status: String) {
@@ -100,7 +95,6 @@ class BorrowListActivity : AppCompatActivity() {
             setTextColor(Color.parseColor("#6C757D"))
         }
 
-        // Set selected tab
         when (status) {
             "BORROWED" -> {
                 binding.tabBorrowed.apply {
@@ -125,23 +119,46 @@ class BorrowListActivity : AppCompatActivity() {
             }
         }
 
-        adapter.updateData(filteredList)
+        // Update adapter dengan data yang sudah difilter dan map
+        adapter.updateData(filteredList, equipmentMap, userMap)
     }
 
     private fun loadBorrows() {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
+
+                // 1. Load equipment names
+                val equipRes = RetrofitClient.apiService.getAllEquipment()
+                if (equipRes.isSuccessful) {
+                    equipmentMap = equipRes.body()?.associate { it.id!! to it.nama } ?: emptyMap()
+                }
+
+                // 2. Load user names (only if admin)
+                if (isAdmin) {
+                    try {
+                        val userRes = RetrofitClient.apiService.getAllUsers("Bearer $token")
+                        if (userRes.isSuccessful) {
+                            userMap = userRes.body()?.associate { it.id!! to it.name } ?: emptyMap()
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                // 3. Load borrow data
                 val response = if (isAdmin) {
                     RetrofitClient.apiService.getAllBorrows("Bearer $token")
                 } else {
-                    val userId = sessionManager.getUserId()
-                    RetrofitClient.apiService.getBorrowsByUser("Bearer $token", userId)
+                    RetrofitClient.apiService.getBorrowsByUser(
+                        "Bearer $token",
+                        sessionManager.getUserId()
+                    )
                 }
 
                 if (response.isSuccessful && response.body() != null) {
                     borrowList = response.body()!!
-                    selectTab("BORROWED") // Default tab
+                    selectTab("BORROWED")
                 } else {
                     Toast.makeText(
                         this@BorrowListActivity,
@@ -163,20 +180,19 @@ class BorrowListActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
 
-        // TAMBAHKAN KONFIGURASI INI UNTUK LEBAR DIALOG
         val width = (resources.displayMetrics.widthPixels * 0.80).toInt()
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
 
         val dialogBinding = DialogBorrowDetailBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
-
-        // Atur ukuran dialog
         dialog.window?.setLayout(width, height)
         dialog.window?.setGravity(Gravity.CENTER)
 
         with(dialogBinding) {
-            // Status
+            // Set status dengan warna yang sesuai
             when (borrow.borrowStatus.uppercase()) {
                 "BORROWED" -> {
                     tvStatus.text = "Dipinjam"
@@ -190,100 +206,123 @@ class BorrowListActivity : AppCompatActivity() {
                     tvStatus.text = "Terlambat"
                     tvStatus.setTextColor(Color.parseColor("#DC3545"))
                 }
+                else -> {
+                    tvStatus.text = borrow.borrowStatus
+                    tvStatus.setTextColor(Color.parseColor("#6C757D"))
+                }
             }
 
-            tvBorrower.text = "User ID: ${borrow.userId}"
-            tvEquipment.text = "Equipment ID: ${borrow.equipmentId}"
+            // **PERBAIKAN: Ganti getUserName() dengan getEmail() atau string "Anda"**
+            tvBorrower.text = if (isAdmin) {
+                userMap[borrow.userId] ?: "User ID: ${borrow.userId}"
+            } else {
+                // Cek apakah ada method getEmail() di SessionManager
+                // Jika tidak, gunakan "Anda" saja
+                val userName = try {
+                    // Coba ambil nama dari session jika ada method yang sesuai
+                    // Misalnya: sessionManager.getEmail() atau sessionManager.getUsername()
+                    "Anda"  // Default
+                } catch (e: Exception) {
+                    "Anda"
+                }
+                userName
+            }
+
+            tvEquipment.text = equipmentMap[borrow.equipmentId] ?: "Equipment ID: ${borrow.equipmentId}"
             tvQuantity.text = "${borrow.jumlahDipinjam} unit"
             tvBorrowDate.text = borrow.borrowDate
 
+            // Jika sudah dikembalikan, tampilkan info pengembalian
             if (borrow.returnDate != null) {
                 layoutReturnDate.visibility = View.VISIBLE
                 tvReturnDate.text = borrow.returnDate
-                tvReceiver.text = borrow.notes ?: "-"
+                tvReceiver.text = if (borrow.notes.isNullOrBlank()) "-" else borrow.notes
+            } else {
+                layoutReturnDate.visibility = View.GONE
             }
 
-            btnClose.setOnClickListener {
-                dialog.dismiss()
-            }
-
-            btnOk.setOnClickListener {
-                dialog.dismiss()
-            }
+            btnClose.setOnClickListener { dialog.dismiss() }
+            btnOk.setOnClickListener { dialog.dismiss() }
         }
 
         dialog.show()
     }
 
-    // Juga perbaiki showReturnDialog dengan cara yang sama:
     private fun showReturnDialog(borrow: Borrow) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
 
-        // TAMBAHKAN KONFIGURASI INI UNTUK LEBAR DIALOG
         val width = (resources.displayMetrics.widthPixels * 0.80).toInt()
         val height = ViewGroup.LayoutParams.WRAP_CONTENT
 
         val dialogBinding = DialogReturnEquipmentBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
-
-        // Atur ukuran dialog
         dialog.window?.setLayout(width, height)
         dialog.window?.setGravity(Gravity.CENTER)
 
         with(dialogBinding) {
-            tvEquipmentName.text = "Equipment ID: ${borrow.equipmentId}"
+            tvEquipmentName.text = equipmentMap[borrow.equipmentId] ?: "ID: ${borrow.equipmentId}"
             tvQuantity.text = "${borrow.jumlahDipinjam} unit"
             tvBorrowDate.text = borrow.borrowDate
 
             // Set tanggal hari ini sebagai default
-            val today = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
-                .format(java.util.Date())
+            val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
             etReturnDate.setText(today)
 
-            btnClose.setOnClickListener {
-                dialog.dismiss()
-            }
+            btnClose.setOnClickListener { dialog.dismiss() }
 
-            // Date Picker
+            // Date picker untuk tanggal pengembalian
             etReturnDate.setOnClickListener {
-                val calendar = java.util.Calendar.getInstance()
-                val datePickerDialog = android.app.DatePickerDialog(
+                val calendar = Calendar.getInstance()
+                DatePickerDialog(
                     this@BorrowListActivity,
                     { _, year, month, dayOfMonth ->
-                        val selectedDate = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth)
+                        val selectedDate = String.format(
+                            "%04d-%02d-%02d",
+                            year,
+                            month + 1,
+                            dayOfMonth
+                        )
                         etReturnDate.setText(selectedDate)
                     },
-                    calendar.get(java.util.Calendar.YEAR),
-                    calendar.get(java.util.Calendar.MONTH),
-                    calendar.get(java.util.Calendar.DAY_OF_MONTH)
-                )
-                datePickerDialog.show()
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH),
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                ).show()
             }
 
             btnConfirm.setOnClickListener {
                 val receiver = etReceiver.text.toString().trim()
-
                 if (receiver.isEmpty()) {
-                    Toast.makeText(this@BorrowListActivity, "Penerima barang harus diisi", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@BorrowListActivity,
+                        "Penerima barang harus diisi",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@setOnClickListener
                 }
-
-                returnEquipment(borrow, dialog)
+                returnEquipment(borrow, receiver, dialog)
             }
         }
 
         dialog.show()
     }
 
-    private fun returnEquipment(borrow: Borrow, dialog: Dialog) {
+    private fun returnEquipment(borrow: Borrow, receiverName: String, dialog: Dialog) {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
+
+                // Kirim Map<String, String> sesuai dengan API yang diharapkan
+                val notesMap = mapOf("notes" to receiverName)
+
                 val response = RetrofitClient.apiService.returnEquipment(
                     "Bearer $token",
-                    borrow.id ?: 0
+                    borrow.id ?: 0,
+                    notesMap  // Perbaikan utama: kirim Map, bukan Borrow object
                 )
 
                 if (response.isSuccessful) {
@@ -293,25 +332,19 @@ class BorrowListActivity : AppCompatActivity() {
                         Toast.LENGTH_SHORT
                     ).show()
                     dialog.dismiss()
-                    loadBorrows()
+                    loadBorrows() // Refresh data
                 } else {
-                    val errorMessage = try {
-                        response.errorBody()?.string() ?: "Gagal mengembalikan peralatan"
-                    } catch (e: Exception) {
-                        "Gagal mengembalikan peralatan"
-                    }
-
+                    val error = response.errorBody()?.string() ?: "Gagal mengembalikan peralatan"
                     Toast.makeText(
                         this@BorrowListActivity,
-                        errorMessage,
+                        error,
                         Toast.LENGTH_LONG
                     ).show()
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
                 Toast.makeText(
                     this@BorrowListActivity,
-                    "Error: ${e.localizedMessage ?: "Terjadi kesalahan"}",
+                    "Error: ${e.message}",
                     Toast.LENGTH_LONG
                 ).show()
             }

@@ -12,16 +12,26 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Logo -->
-        <View
+        <!-- Logo Bulat -->
+        <androidx.cardview.widget.CardView
             android:id="@+id/ivLogo"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginTop="16dp"
-            android:background="@drawable/bg_logo"
+            app:cardCornerRadius="50dp"
+            app:cardElevation="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/logo_simcat"
+                android:scaleType="centerCrop"
+                android:contentDescription="@string/app_name" />
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Title -->
         <TextView

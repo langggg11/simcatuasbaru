@@ -84,17 +84,14 @@ class MyActivitiesActivity : AppCompatActivity() {
     }
 
     private fun updateTabSelection(selected: String) {
-        // Reset semua background
         binding.tabAkanDatang.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
         binding.tabSelesai.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
         binding.tabSemua.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
 
-        // Reset semua font
         binding.tabAkanDatang.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
         binding.tabSelesai.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
         binding.tabSemua.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
 
-        // Set yang aktif
         when (selected) {
             "upcoming" -> {
                 binding.tabAkanDatang.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_selected)
@@ -183,18 +180,11 @@ class MyActivitiesActivity : AppCompatActivity() {
 
     private fun isUpcoming(schedule: Schedule): Boolean {
         return try {
-            // HANDLE BEBERAPA FORMAT TANGGAL:
-            // 1. Format lama: "22 Desember 2025 • 09:00 - 17:00"
-            // 2. Format baru: "22 Desember 2025, 09:00 - 17:00"
-
             val dateStr = if (schedule.dateTime.contains("•")) {
-                // Format lama: split by "•"
                 schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
             } else if (schedule.dateTime.contains(",")) {
-                // Format baru: split by ","
                 schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
             } else {
-                // Format tidak diketahui, gunakan seluruh string
                 schedule.dateTime
             }
 
@@ -204,7 +194,6 @@ class MyActivitiesActivity : AppCompatActivity() {
 
             scheduleDate?.after(currentDate) ?: true
         } catch (e: Exception) {
-            // Jika parsing gagal, anggap kegiatan upcoming
             true
         }
     }
@@ -254,6 +243,7 @@ class MyActivitiesActivity : AppCompatActivity() {
                     updatedParticipation
                 )
 
+                // ✅ Perbaikan: Sukses jika HTTP 200 (tanpa parse JSON response)
                 if (response.isSuccessful) {
                     Toast.makeText(this@MyActivitiesActivity, "Pendaftaran berhasil dibatalkan", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()

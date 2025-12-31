@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.polstat.simcat.R
 import com.polstat.simcat.adapter.EquipmentMemberAdapter
 import com.polstat.simcat.api.RetrofitClient
 import com.polstat.simcat.databinding.ActivityEquipmentListBinding
@@ -65,19 +66,23 @@ class EquipmentListActivity : AppCompatActivity() {
                     equipmentList = response.body()!!
                     adapter.updateData(equipmentList)
                 } else {
-                    Toast.makeText(
-                        this@EquipmentListActivity,
-                        "Gagal memuat peralatan",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@EquipmentListActivity, "Gagal memuat peralatan", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(
-                    this@EquipmentListActivity,
-                    "Error: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(this@EquipmentListActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    // ✅ HELPER: Mendapatkan Gambar berdasarkan Nama
+    private fun getEquipmentImage(name: String?): Int {
+        return when {
+            name?.contains("Travel", true) == true -> R.drawable.chess_board_travel
+            name?.contains("Standar", true) == true -> R.drawable.chess_board_standard
+            name?.contains("Digital", true) == true -> R.drawable.chess_clock_digital
+            name?.contains("Analog", true) == true -> R.drawable.chess_clock_manual
+            name?.contains("Buah", true) == true -> R.drawable.chess_pieces_set
+            else -> R.drawable.logo_simcat // Default image
         }
     }
 
@@ -89,7 +94,6 @@ class EquipmentListActivity : AppCompatActivity() {
         val dialogBinding = DialogBorrowEquipmentBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
 
-        // Atur ukuran dialog menjadi 80% lebar layar
         val displayMetrics = resources.displayMetrics
         val width = (displayMetrics.widthPixels * 0.8).toInt()
         val height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -102,14 +106,11 @@ class EquipmentListActivity : AppCompatActivity() {
             tvAvailable.text = "${equipment.jumlahTersedia ?: equipment.jumlah} unit"
             etQuantity.setText("1")
 
-            // Load dummy image
-            ivEquipment.setBackgroundColor(
-                Color.parseColor("#${Integer.toHexString(equipment.id?.toInt() ?: 0).padStart(6, '0')}")
-            )
+            // ✅ Tampilkan Gambar Asli di Dialog
+            ivEquipment.setImageResource(getEquipmentImage(equipment.nama))
+            ivEquipment.setBackgroundColor(Color.TRANSPARENT) // Hapus background warna acak
 
-            btnClose.setOnClickListener {
-                dialog.dismiss()
-            }
+            btnClose.setOnClickListener { dialog.dismiss() }
 
             btnConfirm.setOnClickListener {
                 val quantity = etQuantity.text.toString().toIntOrNull() ?: 0
@@ -128,7 +129,6 @@ class EquipmentListActivity : AppCompatActivity() {
                 borrowEquipment(equipment, quantity, dialog)
             }
         }
-
         dialog.show()
     }
 
@@ -137,52 +137,29 @@ class EquipmentListActivity : AppCompatActivity() {
             try {
                 val token = sessionManager.getAuthToken()
                 val userId = sessionManager.getUserId()
-
-                // Mengganti LocalDate.now() dengan alternatif yang kompatibel API 24
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
                 val currentDate = dateFormat.format(Date())
 
                 val borrow = Borrow(
                     userId = userId,
                     equipmentId = equipment.id ?: 0,
-                    borrowDate = currentDate, // Gunakan tanggal yang sudah diformat
+                    borrowDate = currentDate,
                     borrowStatus = "BORROWED",
                     jumlahDipinjam = quantity
                 )
 
-                val response = RetrofitClient.apiService.borrowEquipment(
-                    "Bearer $token",
-                    borrow
-                )
+                val response = RetrofitClient.apiService.borrowEquipment("Bearer $token", borrow)
 
                 if (response.isSuccessful) {
-                    Toast.makeText(
-                        this@EquipmentListActivity,
-                        "Peralatan berhasil dipinjam!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@EquipmentListActivity, "Peralatan berhasil dipinjam!", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()
-                    loadEquipment() // Refresh list
+                    loadEquipment()
                 } else {
-                    val errorMessage = try {
-                        response.errorBody()?.string() ?: "Gagal meminjam peralatan"
-                    } catch (e: Exception) {
-                        "Gagal meminjam peralatan"
-                    }
-
-                    Toast.makeText(
-                        this@EquipmentListActivity,
-                        errorMessage,
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(this@EquipmentListActivity, "Gagal meminjam peralatan", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Toast.makeText(
-                    this@EquipmentListActivity,
-                    "Error: ${e.localizedMessage ?: "Terjadi kesalahan"}",
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this@EquipmentListActivity, "Error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
         }
     }

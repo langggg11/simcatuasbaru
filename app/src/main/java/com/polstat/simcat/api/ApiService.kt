@@ -9,14 +9,14 @@ import com.polstat.simcat.model.Borrow
 import com.polstat.simcat.model.Schedule
 import com.polstat.simcat.model.Participation
 import com.polstat.simcat.model.MessageResponse
-import retrofit2.Response
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
+import retrofit2.Response
 import retrofit2.http.*
 
 interface ApiService {
 
     // ==================== AUTH ====================
-
     @POST("register")
     suspend fun register(@Body request: User): Response<User>
 
@@ -24,9 +24,11 @@ interface ApiService {
     suspend fun login(@Body request: AuthRequest): Response<AuthResponse>
 
     // ==================== USER ====================
-
     @GET("api/users/profile")
     suspend fun getProfile(@Header("Authorization") token: String): Response<User>
+
+    @GET("api/users/getall")
+    suspend fun getAllUsers(@Header("Authorization") token: String): Response<List<User>>
 
     @PUT("api/users/profile")
     suspend fun updateProfile(
@@ -52,7 +54,7 @@ interface ApiService {
     suspend fun createEquipment(
         @Header("Authorization") token: String,
         @Body equipment: Equipment
-    ): Response<ResponseBody> // Gunakan ResponseBody untuk teks biasa
+    ): Response<ResponseBody>
 
     @PUT("api/equipment/{id}")
     suspend fun updateEquipment(
@@ -68,18 +70,18 @@ interface ApiService {
     ): Response<ResponseBody>
 
     // ==================== BORROW ====================
-
     @POST("api/borrows/borrow")
     suspend fun borrowEquipment(
         @Header("Authorization") token: String,
         @Body borrow: Borrow
-    ): Response<Borrow>  // ✅ Ubah dari String ke Borrow
+    ): Response<ResponseBody>
 
     @POST("api/borrows/return/{id}")
     suspend fun returnEquipment(
         @Header("Authorization") token: String,
-        @Path("id") id: Long
-    ): Response<Borrow>  // ✅ Ubah dari String ke Borrow
+        @Path("id") id: Long,
+        @Body notes: Map<String, String>  // ✅ Diubah untuk terima RequestBody
+    ): Response<ResponseBody>
 
     @GET("api/borrows/getall")
     suspend fun getAllBorrows(@Header("Authorization") token: String): Response<List<Borrow>>
@@ -98,22 +100,22 @@ interface ApiService {
     suspend fun createSchedule(
         @Header("Authorization") token: String,
         @Body schedule: Schedule
-    ): Response<Schedule> // Tetap Schedule karena backend mengirim objek JSON
+    ): Response<Schedule>
 
     @PUT("api/schedules/{id}")
     suspend fun updateSchedule(
         @Header("Authorization") token: String,
         @Path("id") id: Long,
         @Body schedule: Schedule
-    ): Response<ResponseBody> // Diubah dari MessageResponse
+    ): Response<ResponseBody>
 
     @DELETE("api/schedules/delete/{id}")
     suspend fun deleteSchedule(
         @Header("Authorization") token: String,
         @Path("id") id: Long
-    ): Response<ResponseBody> // Diubah dari MessageResponse
-    // ==================== PARTICIPATION ====================
+    ): Response<ResponseBody>
 
+    // ==================== PARTICIPATION ====================
     @POST("api/participations/register")
     suspend fun registerParticipation(
         @Header("Authorization") token: String,
@@ -125,7 +127,7 @@ interface ApiService {
         @Header("Authorization") token: String,
         @Path("id") id: Long,
         @Body participation: Participation
-    ): Response<String>
+    ): Response<ResponseBody>
 
     @GET("api/participations/schedule/{scheduleId}")
     suspend fun getParticipationsBySchedule(

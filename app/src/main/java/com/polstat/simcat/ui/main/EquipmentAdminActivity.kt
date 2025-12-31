@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Window
 import android.widget.Toast
+import com.polstat.simcat.R
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -20,6 +21,9 @@ import com.polstat.simcat.utils.SessionManager
 import kotlinx.coroutines.launch
 import android.view.WindowManager
 import android.view.Gravity
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ImageView
 
 class EquipmentAdminActivity : AppCompatActivity() {
 
@@ -27,6 +31,23 @@ class EquipmentAdminActivity : AppCompatActivity() {
     private lateinit var sessionManager: SessionManager
     private lateinit var adapter: EquipmentAdminAdapter
     private var equipmentList = listOf<Equipment>()
+
+    // Daftar tipe peralatan
+    private val tipeList = listOf(
+        "PAPAN_CATUR",
+        "PAPAN_CATUR_TRAVEL",
+        "TIMER",
+        "TIMER_DIGITAL",
+        "SET_CATUR"
+    )
+
+    private val tipeDisplayNames = listOf(
+        "Papan Catur Standar",
+        "Papan Catur Travel",
+        "Timer Manual",
+        "Timer Digital",
+        "Set Catur"
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +113,26 @@ class EquipmentAdminActivity : AppCompatActivity() {
         with(dialogBinding) {
             tvTitle.text = "Tambah Peralatan"
 
+            // Setup spinner untuk tipe peralatan
+            val spinnerAdapter = ArrayAdapter(
+                this@EquipmentAdminActivity,
+                android.R.layout.simple_spinner_item,
+                tipeDisplayNames
+            )
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerTipe.adapter = spinnerAdapter
+
+            // Preview gambar berdasarkan tipe yang dipilih
+            spinnerTipe.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                    updatePreviewImage(tipeList[position], ivPreview)
+                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+            // Set default preview
+            updatePreviewImage(tipeList[0], ivPreview)
+
             btnClose.setOnClickListener {
                 dialog.dismiss()
             }
@@ -102,11 +143,12 @@ class EquipmentAdminActivity : AppCompatActivity() {
                 val priceStr = etPrice.text.toString().trim()
                 val totalStr = etTotal.text.toString().trim()
                 val availableStr = etAvailable.text.toString().trim()
+                val selectedTipe = tipeList[spinnerTipe.selectedItemPosition]
 
                 if (validateInput(name, brand, priceStr, totalStr, availableStr)) {
                     val equipment = Equipment(
                         nama = name,
-                        tipe = "CATUR",
+                        tipe = selectedTipe,  // Tipe menentukan gambar
                         merek = brand,
                         harga = priceStr.toDouble(),
                         jumlah = totalStr.toInt(),
@@ -127,6 +169,7 @@ class EquipmentAdminActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
     private fun showEditDialog(equipment: Equipment) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -144,6 +187,32 @@ class EquipmentAdminActivity : AppCompatActivity() {
             etTotal.setText(equipment.jumlah.toString())
             etAvailable.setText((equipment.jumlahTersedia ?: equipment.jumlah).toString())
 
+            // Setup spinner untuk tipe peralatan
+            val spinnerAdapter = ArrayAdapter(
+                this@EquipmentAdminActivity,
+                android.R.layout.simple_spinner_item,
+                tipeDisplayNames
+            )
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerTipe.adapter = spinnerAdapter
+
+            // Set selected tipe
+            val selectedIndex = tipeList.indexOf(equipment.tipe)
+            if (selectedIndex >= 0) {
+                spinnerTipe.setSelection(selectedIndex)
+            }
+
+            // Preview gambar berdasarkan tipe yang dipilih
+            spinnerTipe.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: android.view.View?, position: Int, id: Long) {
+                    updatePreviewImage(tipeList[position], ivPreview)
+                }
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+
+            // Set preview awal
+            updatePreviewImage(equipment.tipe, ivPreview)
+
             btnClose.setOnClickListener {
                 dialog.dismiss()
             }
@@ -154,12 +223,13 @@ class EquipmentAdminActivity : AppCompatActivity() {
                 val priceStr = etPrice.text.toString().trim()
                 val totalStr = etTotal.text.toString().trim()
                 val availableStr = etAvailable.text.toString().trim()
+                val selectedTipe = tipeList[spinnerTipe.selectedItemPosition]
 
                 if (validateInput(name, brand, priceStr, totalStr, availableStr)) {
                     val updatedEquipment = Equipment(
                         id = equipment.id,
                         nama = name,
-                        tipe = equipment.tipe,
+                        tipe = selectedTipe,
                         merek = brand,
                         harga = priceStr.toDouble(),
                         jumlah = totalStr.toInt(),
@@ -180,6 +250,20 @@ class EquipmentAdminActivity : AppCompatActivity() {
 
         dialog.show()
     }
+
+    private fun updatePreviewImage(tipe: String, imageView: ImageView) {
+        val drawableId = when (tipe.uppercase()) {
+            "PAPAN_CATUR" -> R.drawable.chess_board_standard
+            "TIMER" -> R.drawable.chess_clock_manual
+            "SET_CATUR" -> R.drawable.chess_pieces_set
+            "PAPAN_CATUR_TRAVEL" -> R.drawable.chess_board_travel
+            "TIMER_DIGITAL" -> R.drawable.chess_clock_digital
+            else -> R.drawable.equipment_placeholder
+        }
+        imageView.setImageResource(drawableId)
+        imageView.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
+    }
+
     private fun showDeleteDialog(equipment: Equipment) {
         AlertDialog.Builder(this)
             .setTitle("Hapus Peralatan")

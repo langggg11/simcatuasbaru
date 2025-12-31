@@ -27,6 +27,7 @@ class MonitoringActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMonitoringBinding
     private lateinit var sessionManager: SessionManager
     private var allSchedules = listOf<Schedule>()
+    private var userMap = mapOf<Long, String>() // ✅ Map untuk menyimpan Nama User
     private var currentFilter = "upcoming"
     private lateinit var adapter: MonitoringAdapter
 
@@ -39,7 +40,7 @@ class MonitoringActivity : AppCompatActivity() {
 
         setupUI()
         setupListeners()
-        loadSchedules()
+        loadData()
     }
 
     private fun setupUI() {
@@ -75,17 +76,14 @@ class MonitoringActivity : AppCompatActivity() {
     }
 
     private fun updateTabSelection(selected: String) {
-        // Reset semua background
         binding.tabAkanDatang.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
         binding.tabSelesai.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
         binding.tabSemua.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_unselected)
 
-        // Reset semua font
         binding.tabAkanDatang.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
         binding.tabSelesai.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
         binding.tabSemua.typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
 
-        // Set yang aktif
         when (selected) {
             "upcoming" -> {
                 binding.tabAkanDatang.setBackgroundResource(com.polstat.simcat.R.drawable.bg_tab_selected)
@@ -102,11 +100,25 @@ class MonitoringActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadSchedules() {
+    private fun loadData() {
         lifecycleScope.launch {
             try {
-                val response = RetrofitClient.apiService.getAllSchedules()
+                val token = sessionManager.getAuthToken()
 
+                // ✅ 1. Ambil Data User untuk Mapping Nama
+                try {
+                    val usersResponse = RetrofitClient.apiService.getAllUsers("Bearer $token")
+                    if (usersResponse.isSuccessful && usersResponse.body() != null) {
+                        userMap = usersResponse.body()!!.associate { it.id!! to it.name }
+                    } else {
+                        userMap = emptyMap()
+                    }
+                } catch (e: Exception) {
+                    userMap = emptyMap()
+                }
+
+                // 2. Ambil Data Jadwal
+                val response = RetrofitClient.apiService.getAllSchedules()
                 if (response.isSuccessful && response.body() != null) {
                     allSchedules = response.body()!!
                     filterSchedules()
@@ -126,34 +138,24 @@ class MonitoringActivity : AppCompatActivity() {
             "completed" -> allSchedules.filter { !isUpcoming(it) }
             else -> allSchedules
         }
-
         adapter.updateData(filtered)
     }
 
     private fun isUpcoming(schedule: Schedule): Boolean {
         return try {
-            // HANDLE BEBERAPA FORMAT TANGGAL:
-            // 1. Format lama: "22 Desember 2025 • 09:00 - 17:00"
-            // 2. Format baru: "22 Desember 2025, 09:00 - 17:00"
-
             val dateStr = if (schedule.dateTime.contains("•")) {
-                // Format lama: split by "•"
                 schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
             } else if (schedule.dateTime.contains(",")) {
-                // Format baru: split by ","
                 schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
             } else {
-                // Format tidak diketahui, gunakan seluruh string
                 schedule.dateTime
             }
 
             val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
             val scheduleDate = formatter.parse(dateStr)
             val currentDate = Date()
-
             scheduleDate?.after(currentDate) ?: true
         } catch (e: Exception) {
-            // Jika parsing gagal, anggap kegiatan upcoming
             true
         }
     }
@@ -166,7 +168,6 @@ class MonitoringActivity : AppCompatActivity() {
         val dialogBinding = DialogDetailScheduleBinding.inflate(layoutInflater)
         dialog.setContentView(dialogBinding.root)
 
-        // Atur ukuran dialog menjadi 80% lebar layar
         val displayMetrics = resources.displayMetrics
         val width = (displayMetrics.widthPixels * 0.8).toInt()
         val height = WindowManager.LayoutParams.WRAP_CONTENT
@@ -176,10 +177,7 @@ class MonitoringActivity : AppCompatActivity() {
 
         with(dialogBinding) {
             tvTitle.text = schedule.title
-
-            // TAMPILKAN TANGGAL-WAKTU APA ADANYA
             tvDateTime.text = schedule.dateTime
-
             tvLocation.text = schedule.location
             tvDescription.text = schedule.deskripsi ?: "-"
 
@@ -214,7 +212,6 @@ class MonitoringActivity : AppCompatActivity() {
 
             loadParticipants(schedule, dialogBinding)
         }
-
         dialog.show()
     }
 
@@ -222,10 +219,7 @@ class MonitoringActivity : AppCompatActivity() {
         lifecycleScope.launch {
             try {
                 val token = sessionManager.getAuthToken()
-                val response = RetrofitClient.apiService.getParticipationsBySchedule(
-                    "Bearer $token",
-                    schedule.id ?: 0
-                )
+                val response = RetrofitClient.apiService.getParticipationsBySchedule("Bearer $token", schedule.id ?: 0)
 
                 if (response.isSuccessful && response.body() != null) {
                     val participants = response.body()!!.filter { it.status.uppercase() == "REGISTERED" }
@@ -243,6 +237,21 @@ class MonitoringActivity : AppCompatActivity() {
                             tvStatusKuota.text = "$participantCount peserta"
                             tvSlotTersisa.text = "Tidak dibatasi"
                             progressBar.visibility = View.GONE
+                        }
+
+                        // ✅ DAFTAR PESERTA: Gunakan Nama dari userMap
+                        layoutParticipants.removeAllViews()
+                        participants.forEachIndexed { index, p ->
+                            // Ambil nama dari map, fallback ke ID jika tidak ada
+                            val participantName = userMap[p.userId] ?: "User ID: ${p.userId}"
+
+                            val tv = android.widget.TextView(this@MonitoringActivity).apply {
+                                text = "${index + 1}. $participantName"
+                                setPadding(0, 4, 0, 4)
+                                setTextColor(android.graphics.Color.BLACK)
+                                textSize = 14f
+                            }
+                            layoutParticipants.addView(tv)
                         }
                     }
                 }

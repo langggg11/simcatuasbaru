@@ -10,8 +10,8 @@ import com.polstat.simcat.model.Borrow
 class BorrowAdapter(
     private var borrowList: List<Borrow>,
     private val isAdmin: Boolean = false,
-    private val equipmentNames: Map<Long, String> = emptyMap(),
-    private val userNames: Map<Long, String> = emptyMap(),
+    private var equipmentNames: Map<Long, String> = emptyMap(), // ✅ Diubah ke var
+    private var userNames: Map<Long, String> = emptyMap(),      // ✅ Diubah ke var
     private val onDetailClick: (Borrow) -> Unit,
     private val onReturnClick: ((Borrow) -> Unit)? = null
 ) : RecyclerView.Adapter<BorrowAdapter.ViewHolder>() {
@@ -32,7 +32,7 @@ class BorrowAdapter(
         val borrow = borrowList[position]
 
         with(holder.binding) {
-            // Equipment name
+            // ✅ Menggunakan map untuk menampilkan nama alat
             tvEquipmentName.text = equipmentNames[borrow.equipmentId] ?: "Equipment ID: ${borrow.equipmentId}"
 
             // Status
@@ -96,6 +96,8 @@ class BorrowAdapter(
 
     fun updateData(newList: List<Borrow>, newEquipmentNames: Map<Long, String> = emptyMap(), newUserNames: Map<Long, String> = emptyMap()) {
         borrowList = newList
+        if (newEquipmentNames.isNotEmpty()) equipmentNames = newEquipmentNames
+        if (newUserNames.isNotEmpty()) userNames = newUserNames
         notifyDataSetChanged()
     }
 }

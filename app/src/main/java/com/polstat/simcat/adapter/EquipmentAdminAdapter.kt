@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.polstat.simcat.databinding.ItemEquipmentAdminBinding
 import com.polstat.simcat.model.Equipment
 import java.text.NumberFormat
+import com.polstat.simcat.R
 import java.util.*
 
 class EquipmentAdminAdapter(
@@ -30,7 +31,6 @@ class EquipmentAdminAdapter(
         val equipment = equipmentList[position]
 
         with(holder.binding) {
-            // ✅ Gunakan ID yang sesuai dengan layout
             tvName.text = equipment.nama
             tvBrand.text = equipment.merek
 
@@ -42,18 +42,21 @@ class EquipmentAdminAdapter(
             val available = equipment.jumlahTersedia ?: equipment.jumlah
             tvAvailable.text = "Tersedia: $available / ${equipment.jumlah}"
 
-            btnEdit.setOnClickListener {
-                onEditClick(equipment)
+            btnEdit.setOnClickListener { onEditClick(equipment) }
+            btnDelete.setOnClickListener { onDeleteClick(equipment) }
+
+            // SET GAMBAR BERDASARKAN TIPE - PASTIKAN NAMA FILE SESUAI
+            val drawableId = when (equipment.tipe.uppercase()) {
+                "PAPAN_CATUR" -> R.drawable.chess_board_standard
+                "TIMER" -> R.drawable.chess_clock_manual
+                "SET_CATUR" -> R.drawable.chess_pieces_set
+                "PAPAN_CATUR_TRAVEL" -> R.drawable.chess_board_travel
+                "TIMER_DIGITAL" -> R.drawable.chess_clock_digital
+                else -> R.drawable.equipment_placeholder
             }
 
-            btnDelete.setOnClickListener {
-                onDeleteClick(equipment)
-            }
-
-            // Load dummy image
-            ivEquipment.setBackgroundColor(
-                android.graphics.Color.parseColor("#${Integer.toHexString(equipment.id?.toInt() ?: 0).padStart(6, '0')}")
-            )
+            ivEquipment.setImageResource(drawableId)
+            ivEquipment.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
         }
     }
 
