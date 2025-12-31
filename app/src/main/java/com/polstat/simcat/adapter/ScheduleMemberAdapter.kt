@@ -32,10 +32,8 @@ class ScheduleMemberAdapter(
         with(holder.binding) {
             tvTitle.text = schedule.title
 
-            // Parse dateTime
-            val dateTimeParts = schedule.dateTime.split("•")
-            tvDate.text = dateTimeParts.getOrNull(0)?.trim() ?: schedule.dateTime
-            tvTime.text = dateTimeParts.getOrNull(1)?.trim() ?: ""
+            // TAMPILKAN SELURUH dateTime TANPA DIPISAH
+            tvDateTime.text = schedule.dateTime
 
             tvLocation.text = schedule.location
 

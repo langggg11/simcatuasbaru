@@ -93,50 +93,24 @@
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp" />
 
-            <!-- Tanggal -->
+            <!-- Tanggal & Waktu -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Tanggal *"
+                android:text="Tanggal &amp; Waktu *"
                 android:textColor="@color/text_primary"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
 
             <EditText
-                android:id="@+id/etDate"
+                android:id="@+id/etDateTime"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="8dp"
                 android:background="@drawable/bg_input"
-                android:hint="Contoh: 22 Desember 2025"
-                android:inputType="text"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:textColor="@color/text_primary"
-                android:textColorHint="@color/text_hint"
-                android:textSize="14sp"
-                android:fontFamily="sans-serif" />
-
-            <!-- Waktu -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Waktu *"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium" />
-
-            <EditText
-                android:id="@+id/etTime"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="8dp"
-                android:background="@drawable/bg_input"
-                android:hint="Contoh: 09:00 - 17:00"
+                android:hint="Contoh: 22 Desember 2025, 09:00 - 17:00"
                 android:inputType="text"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"

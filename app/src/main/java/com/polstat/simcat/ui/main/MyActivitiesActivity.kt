@@ -183,13 +183,28 @@ class MyActivitiesActivity : AppCompatActivity() {
 
     private fun isUpcoming(schedule: Schedule): Boolean {
         return try {
-            val dateStr = schedule.dateTime.split("•").getOrNull(0)?.trim() ?: return true
+            // HANDLE BEBERAPA FORMAT TANGGAL:
+            // 1. Format lama: "22 Desember 2025 • 09:00 - 17:00"
+            // 2. Format baru: "22 Desember 2025, 09:00 - 17:00"
+
+            val dateStr = if (schedule.dateTime.contains("•")) {
+                // Format lama: split by "•"
+                schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
+            } else if (schedule.dateTime.contains(",")) {
+                // Format baru: split by ","
+                schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
+            } else {
+                // Format tidak diketahui, gunakan seluruh string
+                schedule.dateTime
+            }
+
             val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
             val scheduleDate = formatter.parse(dateStr)
             val currentDate = Date()
 
             scheduleDate?.after(currentDate) ?: true
         } catch (e: Exception) {
+            // Jika parsing gagal, anggap kegiatan upcoming
             true
         }
     }

@@ -48,7 +48,7 @@
 
         </LinearLayout>
 
-        <!-- Date & Time -->
+        <!-- Tanggal & Waktu -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -62,41 +62,18 @@
                 android:src="@drawable/ic_calendar_small" />
 
             <TextView
-                android:id="@+id/tvDate"
+                android:id="@+id/tvDateTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
-                android:text="22 Desember 2025"
+                android:text="22 Desember 2025, 09:00 - 17:00"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif" />
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="4dp"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_clock_small" />
-
-            <TextView
-                android:id="@+id/tvTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="09:00 - 17:00"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp"
-                android:fontFamily="sans-serif" />
-
-        </LinearLayout>
-
+        <!-- Lokasi -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

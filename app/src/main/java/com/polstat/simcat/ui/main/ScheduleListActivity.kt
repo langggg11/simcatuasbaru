@@ -183,17 +183,16 @@ class ScheduleListActivity : AppCompatActivity() {
             btnSave.setOnClickListener {
                 val name = etName.text.toString().trim()
                 val type = spinnerType.selectedItem.toString().uppercase()
-                val date = etDate.text.toString().trim()
-                val time = etTime.text.toString().trim()
+                val dateTime = etDateTime.text.toString().trim()
                 val location = etLocation.text.toString().trim()
                 val maxParticipantsStr = etMaxParticipants.text.toString().trim()
                 val description = etDescription.text.toString().trim()
 
-                if (validateInput(name, date, time, location, maxParticipantsStr)) {
+                if (validateInput(name, dateTime, location, maxParticipantsStr)) {
                     val schedule = Schedule(
                         title = name,
                         tipeKegiatan = type,
-                        dateTime = "$date • $time",
+                        dateTime = dateTime, // Simpan langsung string tanggal-waktu
                         location = location,
                         maxParticipants = maxParticipantsStr.toIntOrNull() ?: 0,
                         deskripsi = description
@@ -238,9 +237,8 @@ class ScheduleListActivity : AppCompatActivity() {
             val typeIndex = types.indexOfFirst { it.uppercase() == schedule.tipeKegiatan.uppercase() }
             if (typeIndex >= 0) spinnerType.setSelection(typeIndex)
 
-            val dateTimeParts = schedule.dateTime.split("•")
-            etDate.setText(dateTimeParts.getOrNull(0)?.trim() ?: "")
-            etTime.setText(dateTimeParts.getOrNull(1)?.trim() ?: "")
+            // Tampilkan tanggal-waktu dari schedule.dateTime
+            etDateTime.setText(schedule.dateTime)
 
             etLocation.setText(schedule.location)
             etMaxParticipants.setText(schedule.maxParticipants?.toString() ?: "0")
@@ -253,18 +251,17 @@ class ScheduleListActivity : AppCompatActivity() {
             btnSave.setOnClickListener {
                 val name = etName.text.toString().trim()
                 val type = spinnerType.selectedItem.toString().uppercase()
-                val date = etDate.text.toString().trim()
-                val time = etTime.text.toString().trim()
+                val dateTime = etDateTime.text.toString().trim()
                 val location = etLocation.text.toString().trim()
                 val maxParticipantsStr = etMaxParticipants.text.toString().trim()
                 val description = etDescription.text.toString().trim()
 
-                if (validateInput(name, date, time, location, maxParticipantsStr)) {
+                if (validateInput(name, dateTime, location, maxParticipantsStr)) {
                     val updatedSchedule = Schedule(
                         id = schedule.id,
                         title = name,
                         tipeKegiatan = type,
-                        dateTime = "$date • $time",
+                        dateTime = dateTime,
                         location = location,
                         maxParticipants = maxParticipantsStr.toIntOrNull() ?: 0,
                         deskripsi = description
@@ -330,8 +327,7 @@ class ScheduleListActivity : AppCompatActivity() {
 
     private fun validateInput(
         name: String,
-        date: String,
-        time: String,
+        dateTime: String,
         location: String,
         maxParticipants: String
     ): Boolean {
@@ -339,12 +335,8 @@ class ScheduleListActivity : AppCompatActivity() {
             Toast.makeText(this, "Nama kegiatan tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return false
         }
-        if (date.isEmpty()) {
-            Toast.makeText(this, "Tanggal tidak boleh kosong", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        if (time.isEmpty()) {
-            Toast.makeText(this, "Waktu tidak boleh kosong", Toast.LENGTH_SHORT).show()
+        if (dateTime.isEmpty()) {
+            Toast.makeText(this, "Tanggal & waktu tidak boleh kosong", Toast.LENGTH_SHORT).show()
             return false
         }
         if (location.isEmpty()) {

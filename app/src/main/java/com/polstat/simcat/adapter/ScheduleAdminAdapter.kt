@@ -31,10 +31,8 @@ class ScheduleAdminAdapter(
         with(holder.binding) {
             tvTitle.text = schedule.title
 
-            // Parse dateTime to extract date and time
-            val dateTimeParts = schedule.dateTime.split("•")
-            tvDate.text = dateTimeParts.getOrNull(0)?.trim() ?: schedule.dateTime
-            tvTime.text = dateTimeParts.getOrNull(1)?.trim() ?: ""
+            // TAMPILKAN SELURUH dateTime TANPA DIPISAH
+            tvDateTime.text = schedule.dateTime
 
             tvLocation.text = schedule.location
 
