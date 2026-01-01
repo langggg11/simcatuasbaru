@@ -98,17 +98,6 @@
 
         </LinearLayout>
 
-        <!-- Participants -->
-        <TextView
-            android:id="@+id/tvParticipants"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Peserta: 24 / 32"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:fontFamily="sans-serif" />
-
         <!-- Action Buttons -->
         <LinearLayout
             android:layout_width="match_parent"

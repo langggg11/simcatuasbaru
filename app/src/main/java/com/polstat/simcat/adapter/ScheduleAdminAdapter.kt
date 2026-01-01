@@ -36,12 +36,7 @@ class ScheduleAdminAdapter(
 
             tvLocation.text = schedule.location
 
-            // Show participants if max is set
-            if (schedule.maxParticipants != null && schedule.maxParticipants > 0) {
-                tvParticipants.text = "Peserta: 0 / ${schedule.maxParticipants}"
-            } else {
-                tvParticipants.text = "Peserta: Tidak dibatasi"
-            }
+            // DIHAPUS - Tidak lagi menampilkan tvParticipants
 
             // Set badge based on type
             when (schedule.tipeKegiatan.uppercase()) {

@@ -212,20 +212,11 @@ class BorrowListActivity : AppCompatActivity() {
                 }
             }
 
-            // **PERBAIKAN: Ganti getUserName() dengan getEmail() atau string "Anda"**
+            // Tampilkan nama peminjam
             tvBorrower.text = if (isAdmin) {
                 userMap[borrow.userId] ?: "User ID: ${borrow.userId}"
             } else {
-                // Cek apakah ada method getEmail() di SessionManager
-                // Jika tidak, gunakan "Anda" saja
-                val userName = try {
-                    // Coba ambil nama dari session jika ada method yang sesuai
-                    // Misalnya: sessionManager.getEmail() atau sessionManager.getUsername()
-                    "Anda"  // Default
-                } catch (e: Exception) {
-                    "Anda"
-                }
-                userName
+                "Anda"
             }
 
             tvEquipment.text = equipmentMap[borrow.equipmentId] ?: "Equipment ID: ${borrow.equipmentId}"
@@ -236,7 +227,7 @@ class BorrowListActivity : AppCompatActivity() {
             if (borrow.returnDate != null) {
                 layoutReturnDate.visibility = View.VISIBLE
                 tvReturnDate.text = borrow.returnDate
-                tvReceiver.text = if (borrow.notes.isNullOrBlank()) "-" else borrow.notes
+                // DIHAPUS: tvReceiver sudah tidak ada di XML
             } else {
                 layoutReturnDate.visibility = View.GONE
             }
@@ -322,7 +313,7 @@ class BorrowListActivity : AppCompatActivity() {
                 val response = RetrofitClient.apiService.returnEquipment(
                     "Bearer $token",
                     borrow.id ?: 0,
-                    notesMap  // Perbaikan utama: kirim Map, bukan Borrow object
+                    notesMap
                 )
 
                 if (response.isSuccessful) {

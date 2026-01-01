@@ -37,11 +37,7 @@ class MonitoringAdapter(
             tvDateTime.text = "$date • $time"
             tvLocation.text = schedule.location
 
-            if (schedule.maxParticipants != null && schedule.maxParticipants > 0) {
-                tvParticipants.text = "0 / ${schedule.maxParticipants} peserta terdaftar"
-            } else {
-                tvParticipants.text = "Peserta tidak dibatasi"
-            }
+            // DIHAPUS - Tidak lagi menampilkan tvParticipants
 
             when (schedule.tipeKegiatan.uppercase()) {
                 "LATIHAN" -> {
