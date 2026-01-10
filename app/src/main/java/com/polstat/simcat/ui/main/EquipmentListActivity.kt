@@ -74,7 +74,7 @@ class EquipmentListActivity : AppCompatActivity() {
         }
     }
 
-    // ✅ HELPER: Mendapatkan Gambar berdasarkan Nama
+    // Mendapatkan Gambar berdasarkan Nama
     private fun getEquipmentImage(name: String?): Int {
         return when {
             name?.contains("Travel", true) == true -> R.drawable.chess_board_travel
@@ -106,7 +106,7 @@ class EquipmentListActivity : AppCompatActivity() {
             tvAvailable.text = "${equipment.jumlahTersedia ?: equipment.jumlah} unit"
             etQuantity.setText("1")
 
-            // ✅ Tampilkan Gambar Asli di Dialog
+            // Tampilkan Gambar Asli di Dialog
             ivEquipment.setImageResource(getEquipmentImage(equipment.nama))
             ivEquipment.setBackgroundColor(Color.TRANSPARENT) // Hapus background warna acak
 

@@ -105,7 +105,7 @@ class MonitoringActivity : AppCompatActivity() {
             try {
                 val token = sessionManager.getAuthToken()
 
-                // ✅ 1. Ambil Data User untuk Mapping Nama
+                // 1. Ambil Data User untuk Mapping Nama
                 try {
                     val usersResponse = RetrofitClient.apiService.getAllUsers("Bearer $token")
                     if (usersResponse.isSuccessful && usersResponse.body() != null) {
@@ -141,22 +141,75 @@ class MonitoringActivity : AppCompatActivity() {
         adapter.updateData(filtered)
     }
 
+    // Ganti fungsi isUpcoming() di MonitoringActivity dan MyActivitiesActivity
+
     private fun isUpcoming(schedule: Schedule): Boolean {
         return try {
-            val dateStr = if (schedule.dateTime.contains("•")) {
-                schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
-            } else if (schedule.dateTime.contains(",")) {
-                schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
-            } else {
-                schedule.dateTime
+            // Ambil bagian tanggal saja (sebelum spasi atau karakter pemisah)
+            val dateStr = when {
+                schedule.dateTime.contains("•") ->
+                    schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(",") ->
+                    schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(" ") ->
+                    schedule.dateTime.split(" ").getOrNull(0)?.trim() ?: schedule.dateTime
+                else -> schedule.dateTime
             }
 
-            val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
-            val scheduleDate = formatter.parse(dateStr)
+            val formats = listOf(
+                // Format dari database: 2025-12-15
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
+                // Format Indonesia: 15 Desember 2025
+                SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID")),
+                // Format dengan garis miring: 15/12/2025
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
+                // Format dengan strip: 15-12-2025
+                SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            )
+
+            var scheduleDate: Date? = null
+
+            // Coba parsing dengan semua format
+            for (format in formats) {
+                try {
+                    format.isLenient = false // Strict parsing
+                    scheduleDate = format.parse(dateStr)
+                    if (scheduleDate != null) {
+                        break // Berhasil parsing, keluar dari loop
+                    }
+                } catch (e: Exception) {
+                    continue // Coba format berikutnya
+                }
+            }
+
+            // Jika parsing gagal semua, anggap sudah selesai
+            if (scheduleDate == null) {
+                return false
+            }
+
             val currentDate = Date()
-            scheduleDate?.after(currentDate) ?: true
+
+            // Bandingkan tanggal (ignore waktu)
+            val calSchedule = Calendar.getInstance().apply { time = scheduleDate }
+            val calCurrent = Calendar.getInstance().apply { time = currentDate }
+
+            // Set waktu ke 00:00:00 untuk compare tanggal saja
+            calSchedule.set(Calendar.HOUR_OF_DAY, 0)
+            calSchedule.set(Calendar.MINUTE, 0)
+            calSchedule.set(Calendar.SECOND, 0)
+            calSchedule.set(Calendar.MILLISECOND, 0)
+
+            calCurrent.set(Calendar.HOUR_OF_DAY, 0)
+            calCurrent.set(Calendar.MINUTE, 0)
+            calCurrent.set(Calendar.SECOND, 0)
+            calCurrent.set(Calendar.MILLISECOND, 0)
+
+            // Kegiatan dianggap "Akan Datang" jika tanggal kegiatan > hari ini
+            calSchedule.time.after(calCurrent.time)
+
         } catch (e: Exception) {
-            true
+            e.printStackTrace()
+            false
         }
     }
 
@@ -239,7 +292,6 @@ class MonitoringActivity : AppCompatActivity() {
                             progressBar.visibility = View.GONE
                         }
 
-                        // ✅ DAFTAR PESERTA: Gunakan Nama dari userMap
                         layoutParticipants.removeAllViews()
                         participants.forEachIndexed { index, p ->
                             // Ambil nama dari map, fallback ke ID jika tidak ada

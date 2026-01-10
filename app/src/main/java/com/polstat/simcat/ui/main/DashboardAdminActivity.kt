@@ -42,11 +42,9 @@ class DashboardAdminActivity : AppCompatActivity() {
         }
 
         binding.menuSchedules.setOnClickListener {
-            // CRUD jadwal kegiatan
             startActivity(Intent(this, ScheduleListActivity::class.java))
         }
 
-        // BARU: Monitoring Kegiatan
         binding.menuMonitoring.setOnClickListener {
             startActivity(Intent(this, MonitoringActivity::class.java))
         }

@@ -180,21 +180,57 @@ class MyActivitiesActivity : AppCompatActivity() {
 
     private fun isUpcoming(schedule: Schedule): Boolean {
         return try {
-            val dateStr = if (schedule.dateTime.contains("•")) {
-                schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
-            } else if (schedule.dateTime.contains(",")) {
-                schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
-            } else {
-                schedule.dateTime
+            val dateStr = when {
+                schedule.dateTime.contains("•") ->
+                    schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(",") ->
+                    schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(" ") ->
+                    schedule.dateTime.split(" ").getOrNull(0)?.trim() ?: schedule.dateTime
+                else -> schedule.dateTime
             }
 
-            val formatter = SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID"))
-            val scheduleDate = formatter.parse(dateStr)
-            val currentDate = Date()
+            val formats = listOf(
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
+                SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID")),
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
+                SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            )
 
-            scheduleDate?.after(currentDate) ?: true
+            var scheduleDate: Date? = null
+            for (format in formats) {
+                try {
+                    format.isLenient = false
+                    scheduleDate = format.parse(dateStr)
+                    if (scheduleDate != null) break
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+
+            if (scheduleDate == null) return false
+
+            val currentDate = Date()
+            val calSchedule = Calendar.getInstance().apply {
+                time = scheduleDate
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val calCurrent = Calendar.getInstance().apply {
+                time = currentDate
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            calSchedule.time.after(calCurrent.time)
+
         } catch (e: Exception) {
-            true
+            e.printStackTrace()
+            false
         }
     }
 
@@ -204,6 +240,15 @@ class MyActivitiesActivity : AppCompatActivity() {
     }
 
     private fun showCancelDialog(participation: Participation, schedule: Schedule) {
+        if (!isUpcoming(schedule)) {
+            Toast.makeText(
+                this,
+                "Tidak dapat membatalkan. Kegiatan ini sudah selesai.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -224,6 +269,17 @@ class MyActivitiesActivity : AppCompatActivity() {
                     Toast.makeText(this@MyActivitiesActivity, "Mohon isi alasan pembatalan", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
+
+                if (!isUpcoming(schedule)) {
+                    Toast.makeText(
+                        this@MyActivitiesActivity,
+                        "Tidak dapat membatalkan. Kegiatan ini sudah selesai.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    dialog.dismiss()
+                    return@setOnClickListener
+                }
+
                 cancelParticipation(participation, dialog)
             }
         }
@@ -243,7 +299,6 @@ class MyActivitiesActivity : AppCompatActivity() {
                     updatedParticipation
                 )
 
-                // ✅ Perbaikan: Sukses jika HTTP 200 (tanpa parse JSON response)
                 if (response.isSuccessful) {
                     Toast.makeText(this@MyActivitiesActivity, "Pendaftaran berhasil dibatalkan", Toast.LENGTH_SHORT).show()
                     dialog.dismiss()

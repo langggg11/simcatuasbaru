@@ -37,8 +37,6 @@ class MonitoringAdapter(
             tvDateTime.text = "$date • $time"
             tvLocation.text = schedule.location
 
-            // DIHAPUS - Tidak lagi menampilkan tvParticipants
-
             when (schedule.tipeKegiatan.uppercase()) {
                 "LATIHAN" -> {
                     tvTypeBadge.text = "Latihan"

@@ -192,7 +192,7 @@ class ScheduleListActivity : AppCompatActivity() {
                     val schedule = Schedule(
                         title = name,
                         tipeKegiatan = type,
-                        dateTime = dateTime, // Simpan langsung string tanggal-waktu
+                        dateTime = dateTime,
                         location = location,
                         maxParticipants = maxParticipantsStr.toIntOrNull() ?: 0,
                         deskripsi = description
@@ -237,9 +237,7 @@ class ScheduleListActivity : AppCompatActivity() {
             val typeIndex = types.indexOfFirst { it.uppercase() == schedule.tipeKegiatan.uppercase() }
             if (typeIndex >= 0) spinnerType.setSelection(typeIndex)
 
-            // Tampilkan tanggal-waktu dari schedule.dateTime
             etDateTime.setText(schedule.dateTime)
-
             etLocation.setText(schedule.location)
             etMaxParticipants.setText(schedule.maxParticipants?.toString() ?: "0")
             etDescription.setText(schedule.deskripsi ?: "")
@@ -285,7 +283,72 @@ class ScheduleListActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun isSchedulePast(schedule: Schedule): Boolean {
+        return try {
+            val dateStr = when {
+                schedule.dateTime.contains("•") ->
+                    schedule.dateTime.split("•").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(",") ->
+                    schedule.dateTime.split(",").getOrNull(0)?.trim() ?: schedule.dateTime
+                schedule.dateTime.contains(" ") ->
+                    schedule.dateTime.split(" ").getOrNull(0)?.trim() ?: schedule.dateTime
+                else -> schedule.dateTime
+            }
+
+            val formats = listOf(
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()),
+                SimpleDateFormat("dd MMMM yyyy", Locale("id", "ID")),
+                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()),
+                SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+            )
+
+            var scheduleDate: Date? = null
+            for (format in formats) {
+                try {
+                    format.isLenient = false
+                    scheduleDate = format.parse(dateStr)
+                    if (scheduleDate != null) break
+                } catch (e: Exception) {
+                    continue
+                }
+            }
+
+            if (scheduleDate == null) return false
+
+            val currentDate = Date()
+            val calSchedule = Calendar.getInstance().apply {
+                time = scheduleDate
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+            val calCurrent = Calendar.getInstance().apply {
+                time = currentDate
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }
+
+            !calSchedule.time.after(calCurrent.time)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+
     private fun showJoinDialog(schedule: Schedule) {
+        if (isSchedulePast(schedule)) {
+            Toast.makeText(
+                this,
+                "Tidak dapat mendaftar. Kegiatan ini sudah selesai.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -318,6 +381,15 @@ class ScheduleListActivity : AppCompatActivity() {
             }
 
             btnConfirm.setOnClickListener {
+                if (isSchedulePast(schedule)) {
+                    Toast.makeText(
+                        this@ScheduleListActivity,
+                        "Tidak dapat mendaftar. Kegiatan ini sudah selesai.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    dialog.dismiss()
+                    return@setOnClickListener
+                }
                 joinSchedule(schedule, dialog)
             }
         }
@@ -464,7 +536,6 @@ class ScheduleListActivity : AppCompatActivity() {
                 val token = sessionManager.getAuthToken()
                 val userId = sessionManager.getUserId()
 
-                // Mengganti LocalDateTime.now() dengan alternatif yang kompatibel API 24
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
                 val currentDate = dateFormat.format(Date())
 
